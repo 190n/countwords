@@ -1,18 +1,19 @@
 use std::cmp::Ordering;
 use std::env;
+use std::fmt;
 use std::fmt::Display;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-struct BSTNode<T: Ord + Display> {
+struct BSTNode<T: Ord> {
 	key: T,
 	count: u64,
 	left: Option<Box<BSTNode<T>>>,
 	right: Option<Box<BSTNode<T>>>,
 }
 
-impl<T: Ord + Display> BSTNode<T> {
+impl<T: Ord> BSTNode<T> {
 	fn new(key: T) -> BSTNode<T> {
 		BSTNode {
 			key,
@@ -40,23 +41,27 @@ impl<T: Ord + Display> BSTNode<T> {
 			},
 		};
 	}
+}
 
-	fn print(&self) {
+impl<T: Ord + Display> Display for BSTNode<T> {
+	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		if let Some(left) = &self.left {
-			left.print();
+			left.fmt(f)?;
 		}
-		println!("{} {}", self.key, self.count);
+		write!(f, "{} {}\n", self.key, self.count)?;
 		if let Some(right) = &self.right {
-			right.print();
+			right.fmt(f)?;
 		}
+
+		Ok(())
 	}
 }
 
-struct BST<T: Ord + Display> {
+struct BST<T: Ord> {
 	root: Option<BSTNode<T>>,
 }
 
-impl<T: Ord + Display> BST<T> {
+impl<T: Ord> BST<T> {
 	fn new() -> BST<T> {
 		BST { root: None }
 	}
@@ -67,11 +72,15 @@ impl<T: Ord + Display> BST<T> {
 			None => self.root = Some(BSTNode::<T>::new(key)),
 		};
 	}
+}
 
-	fn print(&self) {
+impl<T: Ord + Display> Display for BST<T> {
+	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		if let Some(root) = &self.root {
-			root.print();
+			root.fmt(f)?;
 		}
+
+		Ok(())
 	}
 }
 
@@ -97,5 +106,5 @@ fn main() {
 		}
 	}
 
-	bst.print();
+	print!("{}", bst);
 }
