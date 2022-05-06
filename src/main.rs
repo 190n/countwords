@@ -58,9 +58,7 @@ struct BST<T: Ord + Display> {
 
 impl<T: Ord + Display> BST<T> {
 	fn new() -> BST<T> {
-		BST {
-			root: None,
-		}
+		BST { root: None }
 	}
 
 	fn increment(&mut self, key: T) {
