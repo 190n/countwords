@@ -6,16 +6,16 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-struct BSTNode<T: Ord> {
+struct WordListNode<T: Ord> {
 	key: T,
 	count: u64,
-	left: Option<Box<BSTNode<T>>>,
-	right: Option<Box<BSTNode<T>>>,
+	left: Option<Box<WordListNode<T>>>,
+	right: Option<Box<WordListNode<T>>>,
 }
 
-impl<T: Ord> BSTNode<T> {
-	fn new(key: T) -> BSTNode<T> {
-		BSTNode {
+impl<T: Ord> WordListNode<T> {
+	fn new(key: T) -> WordListNode<T> {
+		WordListNode {
 			key,
 			count: 1,
 			left: None,
@@ -36,14 +36,14 @@ impl<T: Ord> BSTNode<T> {
 				if let Some(c) = child {
 					c.increment(key);
 				} else {
-					*child = Some(Box::<BSTNode<T>>::new(BSTNode::<T>::new(key)));
+					*child = Some(Box::<WordListNode<T>>::new(WordListNode::<T>::new(key)));
 				}
 			},
 		};
 	}
 }
 
-impl<T: Ord + Display> Display for BSTNode<T> {
+impl<T: Ord + Display> Display for WordListNode<T> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		if let Some(left) = &self.left {
 			left.fmt(f)?;
@@ -57,24 +57,24 @@ impl<T: Ord + Display> Display for BSTNode<T> {
 	}
 }
 
-struct BST<T: Ord> {
-	root: Option<BSTNode<T>>,
+struct WordList<T: Ord> {
+	root: Option<WordListNode<T>>,
 }
 
-impl<T: Ord> BST<T> {
-	fn new() -> BST<T> {
-		BST { root: None }
+impl<T: Ord> WordList<T> {
+	fn new() -> WordList<T> {
+		WordList { root: None }
 	}
 
 	fn increment(&mut self, key: T) {
 		match &mut self.root {
 			Some(root) => root.increment(key),
-			None => self.root = Some(BSTNode::<T>::new(key)),
+			None => self.root = Some(WordListNode::<T>::new(key)),
 		};
 	}
 }
 
-impl<T: Ord + Display> Display for BST<T> {
+impl<T: Ord + Display> Display for WordList<T> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		if let Some(root) = &self.root {
 			root.fmt(f)?;
@@ -84,27 +84,27 @@ impl<T: Ord + Display> Display for BST<T> {
 	}
 }
 
-fn process<R: Read>(bst: &mut BST<String>, file: &mut R) -> io::Result<()> {
+fn process<R: Read>(wl: &mut WordList<String>, file: &mut R) -> io::Result<()> {
 	let mut contents = String::new();
 	file.read_to_string(&mut contents)?;
 	for w in contents.split_whitespace() {
-		bst.increment(String::from(w));
+		wl.increment(String::from(w));
 	}
 	Ok(())
 }
 
 fn main() {
-	let mut bst = BST::<String>::new();
+	let mut wl = WordList::<String>::new();
 	let args: Vec<String> = env::args().collect();
 
 	if args.len() < 2 {
-		process(&mut bst, &mut io::stdin()).expect("error reading stdin");
+		process(&mut wl, &mut io::stdin()).expect("error reading stdin");
 	} else {
 		for filename in &args[1..] {
 			let mut file = File::open(filename).expect("error opening file");
-			process(&mut bst, &mut file).expect("error reading file");
+			process(&mut wl, &mut file).expect("error reading file");
 		}
 	}
 
-	print!("{}", bst);
+	print!("{}", wl);
 }
